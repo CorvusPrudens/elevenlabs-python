@@ -47,7 +47,7 @@ class TTS(API):
 
     @staticmethod
     async def agenerate(
-        text: str, voice: Voice, model: Model, api_key: Optional[str] = None
+        text: str, voice: Voice, model: Model, api_key: Optional[str] = None, **kwargs
     ) -> bytes:
         url = f"{api_base_url_v1}/text-to-speech/{voice.voice_id}"
         data = dict(
@@ -55,7 +55,7 @@ class TTS(API):
             model_id=model.model_id,
             voice_settings=voice.settings.dict() if voice.settings else None,
         )  # type: ignore
-        response = await API.apost(url, json=data, api_key=api_key)
+        response = await API.apost(url, json=data, api_key=api_key, **kwargs)
         return response.content
 
     @staticmethod
@@ -86,6 +86,7 @@ class TTS(API):
         stream_chunk_size: int = 2048,
         api_key: Optional[str] = None,
         latency: int = 1,
+        **kwargs
     ) -> AsyncIterator[bytes]:
         url = f"{api_base_url_v1}/text-to-speech/{voice.voice_id}/stream?optimize_streaming_latency={latency}"
         data = dict(
@@ -93,7 +94,7 @@ class TTS(API):
             model_id=model.model_id,
             voice_settings=voice.settings.dict() if voice.settings else None,
         )  # type: ignore
-        response = await API.apost(url, json=data, stream=True, api_key=api_key)
+        response = await API.apost(url, json=data, stream=True, api_key=api_key, **kwargs)
         async for chunk in response.aiter_bytes(chunk_size=stream_chunk_size):
             if chunk:
                 yield chunk

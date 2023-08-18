@@ -81,6 +81,7 @@ async def agenerate(
     stream: bool = False,
     latency: int = 1,
     stream_chunk_size: int = 2048,
+    **kwargs
 ) -> Union[bytes, AsyncIterator[bytes]]:
     if isinstance(voice, str):
         voice_str = voice
@@ -107,10 +108,10 @@ async def agenerate(
     if stream:
         if isinstance(text, str):
             return TTS.agenerate_stream(
-                text, voice, model, stream_chunk_size, api_key=api_key, latency=latency
+                text, voice, model, stream_chunk_size, api_key=api_key, latency=latency, **kwargs
             )  # noqa E501
         elif isinstance(text, Iterator):
             return await TTS.agenerate_stream_input(text, voice, model, api_key=api_key)
     else:
         assert isinstance(text, str)
-        return await TTS.agenerate(text, voice, model, api_key=api_key)
+        return await TTS.agenerate(text, voice, model, api_key=api_key, **kwargs)
